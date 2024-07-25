@@ -37,7 +37,7 @@ build: promu
 
 crossbuild: promu
 	@echo ">> crossbuilding binaries"
-	@$(PROMU) crossbuild --go=1.20
+	@$(PROMU) crossbuild --go=1.22 --parallelism 4
 
 tarball: promu
 	@echo ">> building release tarball"
@@ -48,10 +48,10 @@ docker: build
 	@docker build -t "$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)" --build-arg BIN_DIR=. .
 
 push: crossbuild
-	@echo ">> building and pushing multi-arch docker images, $(DOCKER_USERNAME),$(DOCKER_IMAGE_NAME),$(GIT_TAG_NAME)"
+	@echo ">> building and pushing multi-arch docker images, $(DOCKER_ORG_NAME),$(DOCKER_IMAGE_NAME),$(GIT_TAG_NAME)"
 	@docker login -u $(DOCKER_USERNAME) -p $(DOCKER_PASSWORD)
 	@docker buildx create --use
-	@docker buildx build -t "$(DOCKER_USERNAME)/$(DOCKER_IMAGE_NAME):$(GIT_TAG_NAME)" \
+	@docker buildx build -t "$(DOCKER_ORG_NAME)/$(DOCKER_IMAGE_NAME):$(GIT_TAG_NAME)" \
 		--output "$(PUSHTAG)" \
 		--platform "$(DOCKER_PLATFORMS)" \
 		.
